@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4">Add Shift</h2>
+{% if message %}
+<div class="alert alert-danger">{{ message }}</div>
+{% endif %}
+<div class="alert alert-info">
+    <strong>Note:</strong> Full-time doctors must work 8 hours per day. Part-time doctors can only work after 2:00 PM for 4 or 5 hours.
+</div>
+<form method="POST" action="/add-shift" class="row g-3">
+    <div class="col-md-4">
+        <label for="day" class="form-label">Day</label>
+        <select name="day" id="day" class="form-select" required>
+            <option value="Saturday">Saturday</option>
+            <option value="Sunday">Sunday</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label for="room" class="form-label">Room</label>
+        <select name="room" id="room" class="form-select" required>
+            {% for room in rooms %}
+            <option value="{{ room.room_name }}">{{ room.room_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label for="doctor_name" class="form-label">Doctor</label>
+        <select name="doctor_name" id="doctor_name" class="form-select" required>
+            {% for doctor in doctors %}
+            <option value="{{ doctor.name }}">{{ doctor.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label for="department" class="form-label">Department</label>
+        <select name="department" id="department" class="form-select" required>
+            {% for department in departments %}
+            <option value="{{ department.department_name }}">{{ department.department_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label for="start_time" class="form-label">Start Time</label>
+        <input type="time" id="start_time" name="start_time" class="form-control" required>
+    </div>
+    <div class="col-md-3">
+        <label for="end_time" class="form-label">End Time</label>
+        <input type="time" id="end_time" name="end_time" class="form-control" required>
+    </div>
+    <div class="col-md-4">
+        <label for="shift_type" class="form-label">Shift Type</label>
+        <select name="shift_type" id="shift_type" class="form-select" required>
+            <option value="Full-Time">Full-Time</option>
+            <option value="Part-Time">Part-Time</option>
+        </select>
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Add Shift</button>
+    </div>
+</form>
+{% endblock %}

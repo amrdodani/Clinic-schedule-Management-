@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Gantt Chart</h2>
+
+<form method="POST" action="/render-gantt" class="mb-4">
+    <label for="department_filter" class="form-label">Filter by Department:</label>
+    <select name="department_filter" id="department_filter" class="form-select" onchange="this.form.submit()">
+        <option value="" {% if not selected_department %}selected{% endif %}>All Departments</option>
+        {% for department in departments %}
+        <option value="{{ department.department_name }}" {% if department.department_name == selected_department %}selected{% endif %}>
+            {{ department.department_name }}
+        </option>
+        {% endfor %}
+    </select>
+</form>
+
+{% if message %}
+<div class="alert alert-warning">{{ message }}</div>
+{% elif gantt_image %}
+<img src="{{ gantt_image }}" alt="Gantt Chart" class="img-fluid">
+{% else %}
+<div class="alert alert-info">No Gantt chart available. Please select a department to view the schedule.</div>
+{% endif %}
+{% endblock %}

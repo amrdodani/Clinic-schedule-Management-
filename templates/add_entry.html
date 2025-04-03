@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Add Schedule Entry</h2>
+<form method="POST" action="/add-entry">
+    <label for="day">Day:</label>
+    <select name="day" id="day" required>
+        <option value="Saturday">Saturday</option>
+        <option value="Sunday">Sunday</option>
+        <option value="Monday">Monday</option>
+        <option value="Tuesday">Tuesday</option>
+        <option value="Wednesday">Wednesday</option>
+        <option value="Thursday">Thursday</option>
+    </select>
+    <br>
+
+    <label for="room">Room:</label>
+    <input type="text" id="room" name="room" required>
+    <br>
+
+    <label for="doctor_name">Doctor Name:</label>
+    <input type="text" id="doctor_name" name="doctor_name" required>
+    <br>
+
+    <label for="department">Department:</label>
+    <input type="text" id="department" name="department" required>
+    <br>
+
+    <label for="start_time">Start Time:</label>
+    <input type="time" id="start_time" name="start_time" required>
+    <br>
+
+    <label for="end_time">End Time:</label>
+    <input type="time" id="end_time" name="end_time" required>
+    <br>
+
+    <label for="shift_type">Shift Type:</label>
+    <select name="shift_type" id="shift_type" required>
+        <option value="Full-Time">Full-Time</option>
+        <option value="Part-Time">Part-Time</option>
+    </select>
+    <br>
+
+    <button type="submit">Add Entry</button>
+</form>
+{% endblock %}

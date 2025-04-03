@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4">Doctor Schedule</h2>
+
+<!-- Filter Form -->
+<form method="GET" action="/schedule" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <label for="filter_day" class="form-label">Filter by Day</label>
+        <select name="filter_day" id="filter_day" class="form-select">
+            <option value="">All Days</option>
+            <option value="Saturday">Saturday</option>
+            <option value="Sunday">Sunday</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label for="filter_room" class="form-label">Filter by Room</label>
+        <select name="filter_room" id="filter_room" class="form-select">
+            <option value="">All Rooms</option>
+            {% for room in rooms %}
+            <option value="{{ room.room_name }}">{{ room.room_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label for="filter_doctor" class="form-label">Filter by Doctor</label>
+        <select name="filter_doctor" id="filter_doctor" class="form-select">
+            <option value="">All Doctors</option>
+            {% for doctor in doctors %}
+            <option value="{{ doctor.name }}">{{ doctor.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+    </div>
+</form>
+
+<!-- Export Options -->
+<div class="mb-4">
+    <h4>Export Schedule</h4>
+    <form method="POST" action="/export-schedule" class="row g-3">
+        <div class="col-md-3">
+            <label for="export_filter_department" class="form-label">Filter by Department</label>
+            <select name="export_filter_department" id="export_filter_department" class="form-select">
+                <option value="">All Departments</option>
+                {% for department in departments %}
+                <option value="{{ department.department_name }}">{{ department.department_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="export_filter_doctor" class="form-label">Filter by Doctor</label>
+            <select name="export_filter_doctor" id="export_filter_doctor" class="form-select">
+                <option value="">All Doctors</option>
+                {% for doctor in doctors %}
+                <option value="{{ doctor.name }}">{{ doctor.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="export_filter_day" class="form-label">Filter by Day</label>
+            <select name="export_filter_day" id="export_filter_day" class="form-select">
+                <option value="">All Days</option>
+                <option value="Saturday">Saturday</option>
+                <option value="Sunday">Sunday</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="export_filter_room" class="form-label">Filter by Room</label>
+            <select name="export_filter_room" id="export_filter_room" class="form-select">
+                <option value="">All Rooms</option>
+                {% for room in rooms %}
+                <option value="{{ room.room_name }}">{{ room.room_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <button type="submit" name="export_type" value="excel" class="btn btn-success w-100">
+                <i class="fas fa-file-excel"></i> Export to Excel
+            </button>
+        </div>
+        <div class="col-md-6">
+            <button type="submit" name="export_type" value="pdf" class="btn btn-danger w-100">
+                <i class="fas fa-file-pdf"></i> Export to PDF
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Schedule Table -->
+{% if schedule %}
+<form method="POST" action="/bulk-delete-schedule">
+    <table class="table table-bordered table-striped schedule-table">
+        <thead class="table-primary">
+            <tr>
+                <th><input type="checkbox" id="select_all" onclick="toggleSelectAll()"></th>
+                <th>#</th>
+                <th>Day</th>
+                <th>Room</th>
+                <th>Doctor</th>
+                <th>Department</th>
+                <th>Branch</th>
+                <th>Designation</th>
+                <th>Contract Type</th>
+                <th>Shift Type</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in schedule %}
+            <tr>
+                <td><input type="checkbox" name="selected_entries" value="{{ entry.id }}"></td>
+                <td>{{ loop.index }}</td>
+                <td>{{ entry.day }}</td>
+                <td>{{ entry.room }}</td>
+                <td>{{ entry.shift.assigned_doctor.name }}</td>
+                <td>{{ entry.shift.assigned_doctor.department }}</td>
+                <td>{{ entry.shift.assigned_doctor.branch or "N/A" }}</td>
+                <td>{{ entry.shift.assigned_doctor.designation or "N/A" }}</td>
+                <td>{{ entry.shift.assigned_doctor.contract_type or "N/A" }}</td>
+                <td>{{ entry.shift.shift_type }}</td>
+                <td>{{ entry.shift.start_time }}</td>
+                <td>{{ entry.shift.end_time }}</td>
+                <td>
+                    <a href="/edit-schedule/{{ entry.id }}" class="btn btn-sm btn-warning">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="/copy-shift/{{ entry.id }}" class="btn btn-sm btn-info">
+                        <i class="fas fa-copy"></i> Copy
+                    </a>
+                    <form method="POST" action="/delete-schedule/{{ entry.id }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this schedule entry?')">
+                        <button type="submit" class="btn btn-sm btn-danger">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-danger mt-3" onclick="return confirm('Are you sure you want to delete the selected entries?')">Delete Selected</button>
+</form>
+{% else %}
+<p class="text-muted">No schedule entries available.</p>
+{% endif %}
+
+<style>
+    .schedule-table th, .schedule-table td {
+        white-space: nowrap; /* Prevent text wrapping */
+    }
+</style>
+
+<script>
+    function toggleSelectAll() {
+        const checkboxes = document.querySelectorAll('input[name="selected_entries"]');
+        const selectAllCheckbox = document.getElementById('select_all');
+        checkboxes.forEach(checkbox => checkbox.checked = selectAllCheckbox.checked);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4">Statistics Dashboard</h2>
+
+<!-- Department Filter -->
+<form method="POST" action="/statistics" class="mb-4">
+    <label for="department_filter" class="form-label">Filter by Department:</label>
+    <select name="department_filter" id="department_filter" class="form-select" onchange="this.form.submit()">
+        <option value="" {% if not selected_department %}selected{% endif %}>All Departments</option>
+        {% for department in departments %}
+        <option value="{{ department.department_name }}" {% if department.department_name == selected_department %}selected{% endif %}>
+            {{ department.department_name }}
+        </option>
+        {% endfor %}
+    </select>
+</form>
+
+<!-- Tabs for switching between views -->
+<ul class="nav nav-tabs" id="statisticsTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
+            Overview
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="charts-tab" data-bs-toggle="tab" data-bs-target="#charts" type="button" role="tab" aria-controls="charts" aria-selected="false">
+            Charts
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tables-tab" data-bs-toggle="tab" data-bs-target="#tables" type="button" role="tab" aria-controls="tables" aria-selected="false">
+            Tables
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content mt-4" id="statisticsTabsContent">
+    <!-- Overview Tab -->
+    <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Doctors</h5>
+                        <p class="card-text display-6">{{ total_doctors or 0 }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Shifts</h5>
+                        <p class="card-text display-6">{{ total_shifts or 0 }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Schedule Entries</h5>
+                        <p class="card-text display-6">{{ total_schedule_entries or 0 }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-danger">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Departments</h5>
+                        <p class="card-text display-6">{{ total_departments or 0 }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Rooms</h5>
+                        <p class="card-text display-6">{{ total_rooms or 0 }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Tab -->
+    <div class="tab-pane fade" id="charts" role="tabpanel" aria-labelledby="charts-tab">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Shift Distribution</div>
+                    <div class="card-body">
+                        <canvas id="shiftDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Doctor Workload</div>
+                    <div class="card-body">
+                        <canvas id="doctorWorkloadChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">Department Workload</div>
+                    <div class="card-body">
+                        <canvas id="departmentWorkloadChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">Time-Based Workload Distribution</div>
+                    <div class="card-body">
+                        <canvas id="workloadChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">Doctor Workload Insights</div>
+                    <div class="card-body">
+                        <canvas id="doctorWorkloadChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tables Tab -->
+    <div class="tab-pane fade" id="tables" role="tabpanel" aria-labelledby="tables-tab">
+        <h3>Doctor Workload</h3>
+        {% if doctor_workload %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Doctor</th>
+                    <th>Number of Shifts</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doctor, count in doctor_workload %}
+                <tr>
+                    <td>{{ doctor }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-muted">No data available for doctor workload.</p>
+        {% endif %}
+
+        <h3>Full-Time vs Part-Time Doctors by Department</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Department</th>
+                    <th>Full-Time Doctors</th>
+                    <th>Part-Time Doctors</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for department, full_time_count in full_time_doctors %}
+                <tr>
+                    <td>{{ department }}</td>
+                    <td>{{ full_time_count }}</td>
+                    <td>
+                        {% for dept, part_time_count in part_time_doctors %}
+                        {% if dept == department %}
+                        {{ part_time_count }}
+                        {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Export Buttons -->
+<div class="mt-4">
+    <h3>Export Statistics</h3>
+    <a href="/export-statistics/excel" class="btn btn-success" aria-label="Export to Excel"><i class="fas fa-file-excel"></i> Export to Excel</a>
+    <a href="/export-statistics/pdf" class="btn btn-danger" aria-label="Export to PDF"><i class="fas fa-file-pdf"></i> Export to PDF</a>
+</div>
+
+<h3>Clinic Utilization</h3>
+<p>Each clinic can accommodate:</p>
+<ul>
+    <li>One full-time doctor (8 hours)</li>
+    <li>One part-time doctor (4 or 5 hours)</li>
+</ul>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Shift Distribution Chart
+    const shiftDistributionCtx = document.getElementById('shiftDistributionChart').getContext('2d');
+    new Chart(shiftDistributionCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Full-Time', 'Part-Time'],
+            datasets: [{
+                data: [{{ full_time_shifts or 0 }}, {{ part_time_shifts or 0 }}],
+                backgroundColor: ['#007bff', '#ffc107']
+            }]
+        }
+    });
+
+    // Doctor Workload Chart
+    const doctorWorkloadCtx = document.getElementById('doctorWorkloadChart').getContext('2d');
+    new Chart(doctorWorkloadCtx, {
+        type: 'bar',
+        data: {
+            labels: [{% for doctor, count in doctor_workload %}'{{ doctor }}',{% endfor %}],
+            datasets: [{
+                label: 'Number of Shifts',
+                data: [{% for doctor, count in doctor_workload %}{{ count }},{% endfor %}],
+                backgroundColor: '#28a745'
+            }]
+        }
+    });
+
+    // Department Workload Chart
+    const departmentWorkloadCtx = document.getElementById('departmentWorkloadChart').getContext('2d');
+    new Chart(departmentWorkloadCtx, {
+        type: 'bar',
+        data: {
+            labels: [{% for department, count in department_workload %}'{{ department }}',{% endfor %}],
+            datasets: [{
+                label: 'Number of Shifts',
+                data: [{% for department, count in department_workload %}{{ count }},{% endfor %}],
+                backgroundColor: '#17a2b8'
+            }]
+        }
+    });
+
+    // Time-Based Workload Chart
+    const workloadCtx = document.getElementById('workloadChart').getContext('2d');
+    new Chart(workloadCtx, {
+        type: 'line',
+        data: {
+            labels: [{% for slot in workload_distribution.keys() %}'{{ slot }}',{% endfor %}],
+            datasets: [{
+                label: 'Workload',
+                data: [{% for count in workload_distribution.values() %}{{ count }},{% endfor %}],
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                fill: true
+            }]
+        },
+        options: {
+            scales: {
+                x: { title: { display: true, text: 'Time Slots' } },
+                y: { title: { display: true, text: 'Number of Shifts' }, beginAtZero: true }
+            }
+        }
+    });
+</script>
+{% endblock %}

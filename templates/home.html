@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Welcome to the Doctor Schedule Management System!</h2>
+<p>Use the navigation bar to view the schedule or see the Gantt chart.</p>
+<p>You can also <a href="/add-shift">add a new shift</a> for a doctor.</p>
+
+<form method="POST" action="/optimize-shifts" class="mt-4">
+    <label for="department_name" class="form-label">Select Department for Optimization:</label>
+    <select name="department_name" id="department_name" class="form-select" required>
+        {% for department in departments %}
+        <option value="{{ department.department_name }}">{{ department.department_name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary mt-3">Optimize Shifts</button>
+</form>
+
+{% if message %}
+<p style="color: green;">{{ message }}</p>
+{% endif %}
+{% endblock %}

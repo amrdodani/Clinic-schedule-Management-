@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Edit Department</h2>
+<form method="POST" action="/edit-department/{{ department.department_id }}" class="mb-4">
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="department_name" class="form-label">Department Name</label>
+            <input type="text" id="department_name" name="department_name" class="form-control" value="{{ department.department_name }}" required>
+        </div>
+        <div class="col-md-6">
+            <label for="location" class="form-label">Location</label>
+            <input type="text" id="location" name="location" class="form-control" value="{{ department.location }}" required>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure the information is accurate?')">Save Changes</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

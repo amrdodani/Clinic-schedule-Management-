@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Edit Doctor</h2>
+<form method="POST" action="/edit-doctor/{{ doctor.id }}" enctype="multipart/form-data" class="mb-4">
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="doctor_name" class="form-label">Doctor Name</label>
+            <input type="text" id="doctor_name" name="doctor_name" class="form-control" value="{{ doctor.name }}" required>
+        </div>
+        <div class="col-md-6">
+            <label for="department_name" class="form-label">Department</label>
+            <select id="department_name" name="department_name" class="form-select" required>
+                {% for department in departments %}
+                <option value="{{ department.department_name }}" {% if department.department_name == doctor.department %}selected{% endif %}>
+                    {{ department.department_name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label for="designation" class="form-label">Designation</label>
+            <select id="designation" name="designation" class="form-select" required>
+                <option value="Consultant" {% if doctor.designation == "Consultant" %}selected{% endif %}>Consultant</option>
+                <option value="Specialist" {% if doctor.designation == "Specialist" %}selected{% endif %}>Specialist</option>
+                <option value="Senior Registrar" {% if doctor.designation == "Senior Registrar" %}selected{% endif %}>Senior Registrar</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Contract Type</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="contract_type" id="full_time" value="Full-Time" {% if doctor.contract_type == "Full-Time" %}checked{% endif %}>
+                <label class="form-check-label" for="full_time">Full-Time</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="contract_type" id="part_time" value="Part-Time" {% if doctor.contract_type == "Part-Time" %}checked{% endif %}>
+                <label class="form-check-label" for="part_time">Part-Time</label>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <label for="note" class="form-label">Note</label>
+            <textarea id="note" name="note" class="form-control" rows="3">{{ doctor.note }}</textarea>
+        </div>
+        <div class="col-md-12">
+            <label for="attachment" class="form-label">Attachment</label>
+            <input type="file" id="attachment" name="attachment" class="form-control">
+            {% if doctor.attachment %}
+            <p>Current Attachment: <a href="/attachments/{{ doctor.attachment.split('/')[-1] }}" target="_blank">View</a></p>
+            {% endif %}
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

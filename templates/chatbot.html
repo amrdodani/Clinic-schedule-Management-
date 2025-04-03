@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Chatbot Assistant</h2>
+<p>Ask questions about doctors, rooms, shifts, schedules, or coverage.</p>
+
+<div class="mb-3">
+    <label for="user-query" class="form-label">Your Question:</label>
+    <input type="text" id="user-query" class="form-control" placeholder="Type your question here...">
+</div>
+<button id="ask-button" class="btn btn-primary">Ask</button>
+
+<div id="chatbot-response" class="mt-4" style="display: none;"></div>
+
+<script>
+    function sendQuery() {
+        const query = document.getElementById("user-query").value;
+        if (!query) {
+            alert("Please enter a question.");
+            return;
+        }
+
+        fetch("/chatbot", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ query: query }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            const responseDiv = document.getElementById("chatbot-response");
+            responseDiv.style.display = "block";
+            responseDiv.innerHTML = data.response; // Render HTML response
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred while processing your request.");
+        });
+    }
+
+    document.getElementById("ask-button").addEventListener("click", sendQuery);
+
+    // Trigger query submission on pressing "Enter"
+    document.getElementById("user-query").addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            sendQuery();
+        }
+    });
+</script>
+{% endblock %}

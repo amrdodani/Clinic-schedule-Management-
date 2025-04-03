@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Copy Shift</h2>
+<p>Copy the following shift to multiple days:</p>
+<ul>
+    <li><strong>Doctor:</strong> {{ entry.shift.assigned_doctor.name }}</li>
+    <li><strong>Room:</strong> {{ entry.room }}</li>
+    <li><strong>Start Time:</strong> {{ entry.shift.start_time }}</li>
+    <li><strong>End Time:</strong> {{ entry.shift.end_time }}</li>
+    <li><strong>Shift Type:</strong> {{ entry.shift.shift_type }}</li>
+</ul>
+
+<form method="POST" action="/copy-shift/{{ entry.id }}">
+    <label for="days">Select Days:</label>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="days" value="Saturday" id="day-saturday">
+        <label class="form-check-label" for="day-saturday">Saturday</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="days" value="Sunday" id="day-sunday">
+        <label class="form-check-label" for="day-sunday">Sunday</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="days" value="Monday" id="day-monday">
+        <label class="form-check-label" for="day-monday">Monday</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="days" value="Tuesday" id="day-tuesday">
+        <label class="form-check-label" for="day-tuesday">Tuesday</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="days" value="Wednesday" id="day-wednesday">
+        <label class="form-check-label" for="day-wednesday">Wednesday</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="days" value="Thursday" id="day-thursday">
+        <label class="form-check-label" for="day-thursday">Thursday</label>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Copy Shift</button>
+</form>
+{% endblock %}

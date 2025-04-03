@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Edit Schedule Entry</h2>
+
+{% if message %}
+<div id="conflict-message" class="alert alert-danger d-flex align-items-center">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <div>
+        <h5><strong>Conflicts Detected:</strong></h5>
+        <ul>
+            {% for conflict in message %}
+            <li><strong>{{ conflict }}</strong></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+<form method="POST" action="/edit-schedule/{{ entry_index }}" class="row g-3">
+    <div class="col-md-4">
+        <label for="day" class="form-label">Day</label>
+        <select name="day" id="day" class="form-select" required>
+            <option value="Saturday" {% if entry.day == "Saturday" %}selected{% endif %}>Saturday</option>
+            <option value="Sunday" {% if entry.day == "Sunday" %}selected{% endif %}>Sunday</option>
+            <option value="Monday" {% if entry.day == "Monday" %}selected{% endif %}>Monday</option>
+            <option value="Tuesday" {% if entry.day == "Tuesday" %}selected{% endif %}>Tuesday</option>
+            <option value="Wednesday" {% if entry.day == "Wednesday" %}selected{% endif %}>Wednesday</option>
+            <option value="Thursday" {% if entry.day == "Thursday" %}selected{% endif %}>Thursday</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label for="room" class="form-label">Room</label>
+        <select name="room" id="room" class="form-select" required>
+            {% for room in rooms %}
+            <option value="{{ room.room_name }}" {% if room.room_name == entry.room %}selected{% endif %}>
+                {{ room.room_name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label for="doctor_name" class="form-label">Doctor</label>
+        <select name="doctor_name" id="doctor_name" class="form-select" required>
+            {% for doctor in doctors %}
+            <option value="{{ doctor.name }}" {% if doctor.name == entry.shift.assigned_doctor.name %}selected{% endif %}>
+                {{ doctor.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label for="department" class="form-label">Department</label>
+        <select name="department" id="department" class="form-select" required>
+            {% for department in departments %}
+            <option value="{{ department.department_name }}" {% if department.department_name == entry.shift.assigned_doctor.department %}selected{% endif %}>
+                {{ department.department_name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label for="start_time" class="form-label">Start Time</label>
+        <input type="time" id="start_time" name="start_time" class="form-control" value="{{ entry.shift.start_time }}" required>
+    </div>
+    <div class="col-md-3">
+        <label for="end_time" class="form-label">End Time</label>
+        <input type="time" id="end_time" name="end_time" class="form-control" value="{{ entry.shift.end_time }}" required>
+    </div>
+    <div class="col-md-4">
+        <label for="shift_type" class="form-label">Shift Type</label>
+        <select name="shift_type" id="shift_type" class="form-select" required>
+            <option value="Full-Time" {% if entry.shift.shift_type == "Full-Time" %}selected{% endif %}>Full-Time</option>
+            <option value="Part-Time" {% if entry.shift.shift_type == "Part-Time" %}selected{% endif %}>Part-Time</option>
+        </select>
+    </div>
+
+    <div class="col-md-12">
+        <label for="apply_to_days" class="form-label">Apply Changes to Other Days:</label>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="apply_to_days" value="Saturday" id="day-saturday">
+            <label class="form-check-label" for="day-saturday">Saturday</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="apply_to_days" value="Sunday" id="day-sunday">
+            <label class="form-check-label" for="day-sunday">Sunday</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="apply_to_days" value="Monday" id="day-monday">
+            <label class="form-check-label" for="day-monday">Monday</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="apply_to_days" value="Tuesday" id="day-tuesday">
+            <label class="form-check-label" for="day-tuesday">Tuesday</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="apply_to_days" value="Wednesday" id="day-wednesday">
+            <label class="form-check-label" for="day-wednesday">Wednesday</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="apply_to_days" value="Thursday" id="day-thursday">
+            <label class="form-check-label" for="day-thursday">Thursday</label>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <label for="apply_to_rooms" class="form-label">Apply Changes to Other Rooms:</label>
+        {% for room in rooms %}
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="apply_to_rooms" value="{{ room.room_name }}" id="room-{{ loop.index }}">
+            <label class="form-check-label" for="room-{{ loop.index }}">{{ room.room_name }}</label>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </div>
+</form>
+
+<style>
+    /* Flashing background animation */
+    @keyframes flashBackground {
+        0% { background-color: #f8d7da; }
+        50% { background-color: #f5c6cb; }
+        100% { background-color: #f8d7da; }
+    }
+
+    #conflict-message {
+        position: relative;
+        padding: 10px;
+        overflow: hidden;
+    }
+
+    #conflict-message::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -1; /* Place the background behind the text */
+        animation: flashBackground 1s infinite;
+    }
+
+    #conflict-message h5, #conflict-message ul, #conflict-message i {
+        position: relative; /* Ensure text stays above the background */
+        z-index: 1; /* Keep text above the flashing background */
+        font-weight: bold; /* Keep the text bold and static */
+    }
+</style>
+{% endblock %}

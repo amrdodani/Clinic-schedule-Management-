@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Knowledge Base</h2>
+<form method="POST" action="/knowledge-base" class="mb-4">
+    <div class="mb-3">
+        <label for="question" class="form-label">Question</label>
+        <input type="text" id="question" name="question" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="answer" class="form-label">Answer</label>
+        <textarea id="answer" name="answer" class="form-control" rows="3" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Entry</button>
+</form>
+
+<h3>Existing Entries</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Question</th>
+            <th>Answer</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in entries %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ entry.question }}</td>
+            <td>{{ entry.answer }}</td>
+            <td>
+                <form method="POST" action="/delete-knowledge/{{ entry.id }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this entry?')">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,7 @@
+Flask==2.3.2
+Flask-SQLAlchemy==3.0.5
+Flask-Migrate==4.0.4
+matplotlib==3.8.0
+streamlit==1.25.0
+ortools==9.6.2534
+transformers>=4.41.0

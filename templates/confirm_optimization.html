@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Confirm Shift Optimization</h2>
+<p>Review the proposed shift optimization for the <strong>{{ department_name }}</strong> department:</p>
+
+<!-- Proposed Schedule Table -->
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Doctor</th>
+            <th>Day</th>
+            <th>Room</th>
+            <th>Time Slot</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in proposed_schedule %}
+        <tr>
+            <td>{{ entry.doctor }}</td>
+            <td>{{ entry.day }}</td>
+            <td>{{ entry.room }}</td>
+            <td>{{ entry.time_slot }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Gantt Chart Section -->
+<h3 class="mt-5">Optimized Schedule Gantt Chart</h3>
+{% if gantt_image %}
+<img src="{{ gantt_image }}" alt="Gantt Chart" class="img-fluid">
+{% else %}
+<div class="alert alert-info">No Gantt chart available for the optimized schedule.</div>
+{% endif %}
+
+<!-- Confirm and Apply Buttons -->
+<form method="POST" action="/apply-optimization">
+    <input type="hidden" name="department_name" value="{{ department_name }}">
+    <button type="submit" class="btn btn-success">Confirm and Apply</button>
+    <a href="/" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
